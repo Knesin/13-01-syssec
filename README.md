@@ -24,6 +24,25 @@
 ---
 ### Решение 1
 
+Результат сканирования 
+
+![nmap](img/screen1.png)
+
+На сканируемой машине работают:
+- Сервера FTP, почтовый, HTTP, DNS
+- Разрешен доступ по SSH и Telnet
+- Работают базы данных MySQL и PostgeSQL
+
+Подробно просканируем отдельные порты и найдём уязвимости:
+
+![nmap 22](img/screen2.png)
+- Уязвимость [OpenSSH 2.3 < 7.7 - Username Enumeration](https://www.exploit-db.com/exploits/45233)
+
+![nmap 445](img/screen3.png)
+- Уязвимость  [Samba < 3.0.20 - Remote Heap Overflow](https://www.exploit-db.com/exploits/7701)
+
+![nmap 3306](img/screen4.png)
+- [MySQL 5.1.48 - 'EXPLAIN' Denial of Service](https://www.exploit-db.com/exploits/34506)
 ---
 
 ### Задание 2
@@ -41,5 +60,27 @@
 
 ---
 ### Решение 2
+
+- Режим сканирования SYN `sudo nmap -sS 192.168.166.5`
+  - Результат сканирования ![nmap SYN](img/screen5.png)
+  - Запросы на сканируемый ПК в Wireshark ![ws1](img/screen6.png) 
+  - Ответы ![ws2](img/screen7.png)
+  - nmap в своем результате показывает только те порты которые ответили SYN + ASK, т.е. согласились на установку TCP соединения
+
+- Режим сканирования FIN `sudo nmap -sA 192.168.166.5`
+  - Результат сканирования ![nmap FIN](img/screen8.png)
+  - Запросы и ответы на сканируемый ПК в Wireshark ![ws1](img/screen9.png) 
+  - В результате на все запроса ACK пришел ответ RST, это значит что фильтрация пакетов нет, и firewall не настроен
+
+- Режим сканирования Xmas `sudo nmap -sX 192.168.166.5`
+  - Результат сканирования ![nmap Xmas](img/screen10.png)
+  - Запросы на сканируемый ПК в Wireshark ![ws1](img/screen11.png) 
+  - Ответы ![ws2](img/screen12.png)
+  - nmap отправляет запросы FIN + PSH + URG и в отчёте показывает те которые не ответили RST + ASK, не отвечающие порты могут быть открытыми или ответ по ним блокироваться фаерволом
+  
+- Режим сканирования UDP `sudo nmap -sU 192.168.166.5`
+  - Результат сканирования ![nmap UDP](img/screen13.png)
+  - Запросы и ответы на сканируемый ПК в Wireshark ![ws1](img/screen14.png) 
+  - Отправляются UDP пакеты и ожидается результат
 
 ---
